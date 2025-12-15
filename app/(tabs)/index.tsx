@@ -1,4 +1,5 @@
 // app/(tabs)/index.tsx
+import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import {
   ActivityIndicator,
@@ -12,6 +13,7 @@ import { Movie } from '../../api/types';
 import { useMoviesStore } from '../../store/moviesStore';
 
 export default function HomeScreen() {
+  const router = useRouter();
   const {
     movies,
     loading,
@@ -30,6 +32,7 @@ export default function HomeScreen() {
   const renderMovie = ({ item }: { item: Movie }) => (
     <TouchableOpacity
       activeOpacity={0.88}
+      onPress={() => router.push(`/movie/${item.id}`)}
       className="
         bg-white
         mx-4 mb-4

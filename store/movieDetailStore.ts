@@ -1,4 +1,4 @@
-// src/store/movieDetailStore.ts
+// store/movieDetailStore.ts
 import { create } from 'zustand';
 import MovieService from '../api/endpoints';
 import { Cast, MovieDetail } from '../api/types';
@@ -11,7 +11,6 @@ interface MovieDetailState {
   
   // Actions
   fetchMovieDetails: (movieId: number) => Promise<void>;
-  fetchMovieCredits: (movieId: number) => Promise<void>;
   reset: () => void;
 }
 
@@ -36,29 +35,33 @@ export const useMovieDetailStore = create<MovieDetailState>((set) => ({
           movie: detailsResponse.data,
           cast: creditsResponse.data.cast.slice(0, 10), // Top 10 cast members
           loading: false,
+          error: null,
         });
       } else {
-        const error = !detailsResponse.success 
-          ? (detailsResponse as any).error 
-          : (creditsResponse as any).error;
+        // Handle error from either response
+        let errorMessage = 'Failed to load movie details';
+        
+        if (!detailsResponse.success) {
+          errorMessage = detailsResponse.error;
+        } else if (!creditsResponse.success) {
+          errorMessage = creditsResponse.error;
+        }
+        
         set({
-          error,
+          error: errorMessage,
           loading: false,
+          movie: null,
+          cast: [],
         });
       }
     } catch (err) {
+      console.error('Movie details error:', err);
       set({
         error: 'An unexpected error occurred',
         loading: false,
+        movie: null,
+        cast: [],
       });
-    }
-  },
-
-  fetchMovieCredits: async (movieId: number) => {
-    const response = await MovieService.getMovieCredits(movieId);
-    
-    if (response.success) {
-      set({ cast: response.data.cast.slice(0, 10) });
     }
   },
 
