@@ -1,6 +1,5 @@
 // src/api/client.ts
 import axios, { AxiosError, AxiosInstance } from 'axios';
-import Constants from 'expo-constants';
 
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p';
@@ -10,11 +9,11 @@ class ApiClient {
   private apiKey: string;
 
   constructor() {
-    // Get API key from expo-constants
-    this.apiKey = Constants.expoConfig?.extra?.tmdbApiKey || '';
+    // Get API key from environment variable
+    this.apiKey = process.env.EXPO_PUBLIC_TMDB_API_KEY || '';
     
     if (!this.apiKey) {
-      console.warn(' TMDB API key not found. Please add it to app.json');
+      console.warn('⚠️ TMDB API key not found. Please add EXPO_PUBLIC_TMDB_API_KEY to your .env file');
     }
     
     this.client = axios.create({
@@ -50,7 +49,6 @@ class ApiClient {
 
   private handleError(error: AxiosError): string {
     if (error.response) {
-      // Server responded with error
       const status = error.response.status;
       switch (status) {
         case 401:
@@ -67,10 +65,8 @@ class ApiClient {
           return 'An error occurred. Please try again.';
       }
     } else if (error.request) {
-      // Request made but no response
       return 'Network error. Please check your internet connection.';
     } else {
-      // Something else happened
       return 'An unexpected error occurred.';
     }
   }

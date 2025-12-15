@@ -50,7 +50,6 @@
       "reactCompiler": true
     },
     "extra": {
-      "tmdbApiKey": "9c02a24516ea8ad921b6f98b3746d339",
       "router": {},
       "eas": {
         "projectId": "154ef228-84a1-4a09-9adb-409ec0a77095"
