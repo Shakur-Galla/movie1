@@ -13,6 +13,7 @@ import {
 import MovieService from '../../api/endpoints';
 import { useFavoritesStore } from '../../store/favoritesStore';
 import { useMovieDetailStore } from '../../store/movieDetailStore';
+import { MovieDetailSkeleton } from '@/components/Skeleton';
 
 export default function MovieDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -66,12 +67,7 @@ export default function MovieDetailScreen() {
   };
 
   if (loading) {
-    return (
-      <View className="flex-1 bg-[#F7F7F5] justify-center items-center">
-        <ActivityIndicator size="large" color="#C9A24D" />
-        <Text className="text-gray-400 mt-4">Loading movie details…</Text>
-      </View>
-    );
+    return <MovieDetailSkeleton />;
   }
 
   if (error) {

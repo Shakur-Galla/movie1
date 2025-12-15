@@ -11,8 +11,8 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useDebounce } from '../..//hooks/useDebounce';
 import { Movie } from '../../api/types';
-import { useDebounce } from '../../hooks/useDebounce';
 import { useSearchStore } from '../../store/searchStore';
 
 export default function SearchScreen() {
@@ -93,9 +93,7 @@ export default function SearchScreen() {
       return (
         <View className="items-center py-28">
           <ActivityIndicator size="large" color="#C9A24D" />
-          <Text className="text-sm text-gray-400 mt-4">
-            Searching…
-          </Text>
+          <Text className="text-sm text-gray-400 mt-4">Searching…</Text>
         </View>
       );
     }
@@ -115,9 +113,7 @@ export default function SearchScreen() {
             activeOpacity={0.85}
             className="bg-gray-900 px-6 py-3 rounded-xl"
           >
-            <Text className="text-white font-medium">
-              Retry
-            </Text>
+            <Text className="text-white font-medium">Retry</Text>
           </TouchableOpacity>
         </View>
       );
@@ -125,26 +121,26 @@ export default function SearchScreen() {
 
     if (hasSearched && movies.length === 0) {
       return (
-        <View className="items-center py-24 px-6">
+        <View className="items-center py-28 px-6">
           <Ionicons name="search-outline" size={56} color="#D1D5DB" />
-          <Text className="text-gray-600 text-base mt-4 font-medium">
-            No results found
+          <Text className="text-gray-900 font-semibold text-lg mt-4">
+            No movies found
           </Text>
-          <Text className="text-gray-400 text-sm text-center mt-2">
-            Try a different movie title
+          <Text className="text-gray-400 text-center mt-2">
+            Try searching for something else
           </Text>
         </View>
       );
     }
 
     return (
-      <View className="items-center py-24 px-6">
+      <View className="items-center py-28 px-6">
         <Ionicons name="film-outline" size={56} color="#D1D5DB" />
-        <Text className="text-gray-600 text-base mt-4 font-medium">
+        <Text className="text-gray-900 font-semibold text-lg mt-4">
           Search for movies
         </Text>
-        <Text className="text-gray-400 text-sm text-center mt-2">
-          Enter a title to get started
+        <Text className="text-gray-400 text-center mt-2">
+          Enter a movie title to get started
         </Text>
       </View>
     );
@@ -168,21 +164,13 @@ export default function SearchScreen() {
 
   return (
     <View className="flex-1 bg-[#F7F7F5]">
-      {/* Aadily-style search header */}
       <View className="pt-14 pb-6 px-5 bg-white border-b border-gray-100">
         <Text className="text-3xl font-bold text-gray-900 tracking-tight mb-4">
           Search
         </Text>
-
-        <View className="
-          flex-row items-center
-          bg-[#F2F2F0]
-          rounded-2xl
-          px-4 py-3
-          border border-gray-200
-        ">
+        
+        <View className="flex-row items-center bg-gray-100 rounded-2xl px-4 py-3">
           <Ionicons name="search" size={20} color="#9CA3AF" />
-
           <TextInput
             value={query}
             onChangeText={setQuery}
@@ -193,7 +181,6 @@ export default function SearchScreen() {
             autoCorrect={false}
             returnKeyType="search"
           />
-
           {query.length > 0 && (
             <TouchableOpacity onPress={handleClearSearch} className="ml-2">
               <Ionicons name="close-circle" size={20} color="#9CA3AF" />
@@ -202,7 +189,7 @@ export default function SearchScreen() {
         </View>
 
         {hasSearched && movies.length > 0 && (
-          <Text className="text-sm text-gray-500 mt-3">
+          <Text className="text-gray-500 text-sm mt-3">
             Found {movies.length} result{movies.length !== 1 ? 's' : ''}
           </Text>
         )}

@@ -1,4 +1,5 @@
 // app/(tabs)/index.tsx
+import { MovieCardSkeleton } from '@/components/Skeleton';
 import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import {
@@ -57,7 +58,7 @@ export default function HomeScreen() {
         </View>
 
         <View className="bg-[#C9A24D]/15 px-3 py-1.5 rounded-full">
-          <Text className="text-sm font-semibold text-[#C9A24D]">
+          <Text className="text-sm font-semibold text-blue-500">
             ★ {item.vote_average.toFixed(1)}
           </Text>
         </View>
@@ -77,11 +78,10 @@ export default function HomeScreen() {
   const renderEmpty = () => {
     if (loading && movies.length === 0) {
       return (
-        <View className="items-center py-28">
-          <ActivityIndicator size="large" color="#C9A24D" />
-          <Text className="text-sm text-gray-400 mt-4">
-            Curating movies for you…
-          </Text>
+        <View>
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <MovieCardSkeleton key={i} />
+          ))}
         </View>
       );
     }
