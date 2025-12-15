@@ -1,14 +1,19 @@
 {
   "expo": {
     "name": "movie1",
+    "newArchEnabled": true,
     "slug": "movie1",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo.jpeg",
     "scheme": "movie1",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shakurgalla.movie1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,7 +23,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.shakurgalla.movie1"
     },
     "web": {
       "output": "static",
@@ -29,7 +35,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo.jpeg",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
@@ -44,7 +50,10 @@
       "reactCompiler": true
     },
     "extra": {
-      "tmdbApiKey": "9c02a24516ea8ad921b6f98b3746d339"
+      "router": {},
+      "eas": {
+        "projectId": "154ef228-84a1-4a09-9adb-409ec0a77095"
+      }
     }
   }
 }
