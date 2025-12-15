@@ -44,7 +44,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "tmdbApiKey": "PUT_YOUR_TMDB_API_KEY_HERE"
+      "tmdbApiKey": "9c02a24516ea8ad921b6f98b3746d339"
     }
   }
 }
