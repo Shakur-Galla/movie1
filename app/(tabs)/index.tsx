@@ -8,8 +8,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useMoviesStore } from '../..//store/moviesStore';
 import { Movie } from '../../api/types';
-import { useMoviesStore } from '../../store/moviesStore';
 
 export default function HomeScreen() {
   const {

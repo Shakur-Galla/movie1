@@ -1,5 +1,6 @@
 // app/(tabs)/search.tsx
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useEffect } from 'react';
 import {
     ActivityIndicator,
@@ -10,11 +11,12 @@ import {
     TouchableOpacity,
     View,
 } from 'react-native';
+import { useDebounce } from '../..//hooks/useDebounce';
 import { useSearchStore } from '../..//store/searchStore';
 import { Movie } from '../../api/types';
-import { useDebounce } from '../../hooks/useDebounce';
 
 export default function SearchScreen() {
+  const router = useRouter();
   const {
     query,
     movies,
@@ -45,6 +47,7 @@ export default function SearchScreen() {
     <TouchableOpacity
       className="bg-white border border-gray-200 rounded-lg p-4 mb-3 mx-4"
       activeOpacity={0.7}
+      onPress={() => router.push(`/movie/${item.id}`)}
     >
       <View className="flex-row justify-between items-start">
         <View className="flex-1 pr-3">
