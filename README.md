@@ -1,6 +1,9 @@
 # Movie Discovery App
 
 The Movie1 mobile application built with React Native and Expo that allows users to discover, search, and save their favorite movies using The Movie Database (TMDB) API.
+![Screenshot_20251215-083148 (1)](https://github.com/user-attachments/assets/a8c42bfd-3473-4ca8-8ff7-8218a5850a93)
+
+![Screenshot_20251215-083505](https://github.com/user-attachments/assets/79fd72f8-5b8d-44f3-b96e-5180bbe1907c)
 
 ## Table of Contents
 
