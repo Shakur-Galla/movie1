@@ -212,20 +212,10 @@ npx expo install @react-native-async-storage/async-storage
 
 ### 2. Configure Environment Variables
 
-Update your `app.json` file with your API key:
+Update your `.env` file with your API key:
 
 ```json
-{
-  "expo": {
-    "name": "movie1",
-    "slug": "movie1",
-    "version": "1.0.0",
-    // ... other configuration ...
-    "extra": {
-      "tmdbApiKey": "YOUR_TMDB_API_KEY_HERE"
-    }
-  }
-}
+EXPO_PUBLIC_TMDB_API_KEY=APIKEY_GOES_HERE
 ```
 
 **Security Note**: For production applications, consider using `expo-constants` with environment-specific configuration files and never commit API keys to version control.
