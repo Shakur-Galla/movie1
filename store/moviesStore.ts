@@ -1,4 +1,4 @@
-// src/store/moviesStore.ts
+// store/moviesStore.ts
 import { create } from 'zustand';
 import MovieService from '../api/endpoints';
 import { Movie } from '../api/types';

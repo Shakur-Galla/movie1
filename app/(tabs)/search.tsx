@@ -1,31 +1,45 @@
-// app/(tabs)/index.tsx
+// app/(tabs)/search.tsx
+import { Ionicons } from '@expo/vector-icons';
 import React, { useEffect } from 'react';
 import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    Keyboard,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native';
+import { useSearchStore } from '../..//store/searchStore';
 import { Movie } from '../../api/types';
-import { useMoviesStore } from '../../store/moviesStore';
+import { useDebounce } from '../../hooks/useDebounce';
 
-export default function HomeScreen() {
+export default function SearchScreen() {
   const {
+    query,
     movies,
     loading,
-    refreshing,
     error,
     hasMore,
-    fetchMovies,
-    fetchMoreMovies,
-    refreshMovies,
-  } = useMoviesStore();
+    hasSearched,
+    setQuery,
+    searchMovies,
+    loadMoreResults,
+    clearSearch,
+  } = useSearchStore();
+
+  const debouncedQuery = useDebounce(query, 500);
 
   useEffect(() => {
-    fetchMovies();
-  }, []);
+    if (debouncedQuery) {
+      searchMovies(debouncedQuery);
+    }
+  }, [debouncedQuery]);
+
+  const handleClearSearch = () => {
+    clearSearch();
+    Keyboard.dismiss();
+  };
 
   const renderMovie = ({ item }: { item: Movie }) => (
     <TouchableOpacity
@@ -59,7 +73,7 @@ export default function HomeScreen() {
       return (
         <View className="flex-1 justify-center items-center py-20">
           <ActivityIndicator size="large" color="#007AFF" />
-          <Text className="text-gray-500 mt-4">Loading movies...</Text>
+          <Text className="text-gray-500 mt-4">Searching...</Text>
         </View>
       );
     }
@@ -70,7 +84,7 @@ export default function HomeScreen() {
           <Text className="text-red-600 font-semibold text-lg mb-2">Error</Text>
           <Text className="text-gray-600 text-center mb-4">{error}</Text>
           <TouchableOpacity
-            onPress={fetchMovies}
+            onPress={() => searchMovies(query)}
             className="bg-blue-500 px-6 py-3 rounded-lg"
           >
             <Text className="text-white font-semibold">Retry</Text>
@@ -79,9 +93,25 @@ export default function HomeScreen() {
       );
     }
 
+    if (hasSearched && movies.length === 0) {
+      return (
+        <View className="flex-1 justify-center items-center py-20 px-4">
+          <Ionicons name="search-outline" size={64} color="#D1D5DB" />
+          <Text className="text-gray-500 text-lg mt-4">No movies found</Text>
+          <Text className="text-gray-400 text-center mt-2">
+            Try searching for something else
+          </Text>
+        </View>
+      );
+    }
+
     return (
-      <View className="flex-1 justify-center items-center py-20">
-        <Text className="text-gray-500">No movies found</Text>
+      <View className="flex-1 justify-center items-center py-20 px-4">
+        <Ionicons name="film-outline" size={64} color="#D1D5DB" />
+        <Text className="text-gray-500 text-lg mt-4">Search for movies</Text>
+        <Text className="text-gray-400 text-center mt-2">
+          Enter a movie title to get started
+        </Text>
       </View>
     );
   };
@@ -98,17 +128,39 @@ export default function HomeScreen() {
 
   const handleEndReached = () => {
     if (!loading && hasMore) {
-      fetchMoreMovies();
+      loadMoreResults();
     }
   };
 
   return (
     <View className="flex-1 bg-gray-50">
       <View className="bg-white pt-16 pb-4 px-4 border-b border-gray-200">
-        <Text className="text-3xl font-bold text-gray-900">Movies</Text>
-        <Text className="text-gray-500 mt-1">
-          Popular & Trending • {movies.length} movies
-        </Text>
+        <Text className="text-3xl font-bold text-gray-900 mb-4">Search</Text>
+        
+        <View className="flex-row items-center bg-gray-100 rounded-lg px-4 py-3">
+          <Ionicons name="search" size={20} color="#9CA3AF" />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search movies..."
+            placeholderTextColor="#9CA3AF"
+            className="flex-1 ml-2 text-base text-gray-900"
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyType="search"
+          />
+          {query.length > 0 && (
+            <TouchableOpacity onPress={handleClearSearch} className="ml-2">
+              <Ionicons name="close-circle" size={20} color="#9CA3AF" />
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {hasSearched && movies.length > 0 && (
+          <Text className="text-gray-500 mt-2">
+            Found {movies.length} result{movies.length !== 1 ? 's' : ''}
+          </Text>
+        )}
       </View>
 
       <FlatList
@@ -120,14 +172,7 @@ export default function HomeScreen() {
         ListFooterComponent={renderFooter}
         onEndReached={handleEndReached}
         onEndReachedThreshold={0.5}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={refreshMovies}
-            colors={['#007AFF']}
-            tintColor="#007AFF"
-          />
-        }
+        keyboardShouldPersistTaps="handled"
       />
     </View>
   );
