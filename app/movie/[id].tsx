@@ -1,7 +1,7 @@
 // app/movie/[id].tsx
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
@@ -11,6 +11,7 @@ import {
     View,
 } from 'react-native';
 import MovieService from '../../api/endpoints';
+import { useFavoritesStore } from '../../store/favoritesStore';
 import { useMovieDetailStore } from '../../store/movieDetailStore';
 
 export default function MovieDetailScreen() {
@@ -18,19 +19,57 @@ export default function MovieDetailScreen() {
   const router = useRouter();
   const { movie, cast, loading, error, fetchMovieDetails, reset } =
     useMovieDetailStore();
+  const { isFavorite, addFavorite, removeFavorite, loadFavorites, initialized } =
+    useFavoritesStore();
 
+  const [isFav, setIsFav] = useState(false);
+  const [savingFavorite, setSavingFavorite] = useState(false);
+
+  // Load favorites if not initialized
+  useEffect(() => {
+    if (!initialized) {
+      loadFavorites();
+    }
+  }, [initialized]);
+
+  // Fetch movie details
   useEffect(() => {
     if (id) fetchMovieDetails(parseInt(id));
     return () => reset();
   }, [id]);
 
+  // Check if movie is favorited
+  useEffect(() => {
+    if (id) {
+      setIsFav(isFavorite(parseInt(id)));
+    }
+  }, [id, isFavorite]);
+
+  const handleToggleFavorite = async () => {
+    if (!movie) return;
+
+    setSavingFavorite(true);
+
+    if (isFav) {
+      const success = await removeFavorite(movie.id);
+      if (success) {
+        setIsFav(false);
+      }
+    } else {
+      const success = await addFavorite(movie);
+      if (success) {
+        setIsFav(true);
+      }
+    }
+
+    setSavingFavorite(false);
+  };
+
   if (loading) {
     return (
       <View className="flex-1 bg-[#F7F7F5] justify-center items-center">
         <ActivityIndicator size="large" color="#C9A24D" />
-        <Text className="text-gray-400 mt-4">
-          Loading movie details…
-        </Text>
+        <Text className="text-gray-400 mt-4">Loading movie details…</Text>
       </View>
     );
   }
@@ -42,24 +81,15 @@ export default function MovieDetailScreen() {
         <Text className="text-lg font-semibold text-gray-900 mt-4">
           Something went wrong
         </Text>
-        <Text className="text-sm text-gray-500 text-center mt-2">
-          {error}
-        </Text>
-
+        <Text className="text-sm text-gray-500 text-center mt-2">{error}</Text>
         <TouchableOpacity
           onPress={() => id && fetchMovieDetails(parseInt(id))}
-          className="bg-gray-900 px-6 
-          py-3 rounded-xl mt-6"
+          className="bg-gray-900 px-6 py-3 rounded-xl mt-6"
         >
-          <Text className="text-white font-medium">
-            Retry
-          </Text>
+          <Text className="text-white font-medium">Retry</Text>
         </TouchableOpacity>
-
         <TouchableOpacity onPress={() => router.back()} className="mt-4">
-          <Text className="text-gray-500">
-            Go back
-          </Text>
+          <Text className="text-gray-500">Go back</Text>
         </TouchableOpacity>
       </View>
     );
@@ -103,7 +133,6 @@ export default function MovieDetailScreen() {
             <Text className="text-3xl font-bold text-gray-900 flex-1 pr-4">
               {movie.title}
             </Text>
-
             <View className="bg-[#C9A24D]/15 px-3 py-1.5 rounded-full">
               <Text className="text-sm font-semibold text-[#C9A24D]">
                 ★ {movie.vote_average.toFixed(1)}
@@ -114,30 +143,22 @@ export default function MovieDetailScreen() {
           {/* Tagline */}
           {movie.tagline && (
             <Text className="text-gray-500 italic text-base mb-4">
-              “{movie.tagline}”
+              "{movie.tagline}"
             </Text>
           )}
 
           {/* Meta Info */}
           <View className="flex-row flex-wrap gap-2 mb-5">
             <View className="bg-white border border-gray-200 px-3 py-1 rounded-full">
-              <Text className="text-gray-600 text-sm">
-                {movie.release_date}
-              </Text>
+              <Text className="text-gray-600 text-sm">{movie.release_date}</Text>
             </View>
-
             {movie.runtime > 0 && (
               <View className="bg-white border border-gray-200 px-3 py-1 rounded-full">
-                <Text className="text-gray-600 text-sm">
-                  {movie.runtime} min
-                </Text>
+                <Text className="text-gray-600 text-sm">{movie.runtime} min</Text>
               </View>
             )}
-
             <View className="bg-white border border-gray-200 px-3 py-1 rounded-full">
-              <Text className="text-gray-600 text-sm">
-                {movie.status}
-              </Text>
+              <Text className="text-gray-600 text-sm">{movie.status}</Text>
             </View>
           </View>
 
@@ -157,24 +178,36 @@ export default function MovieDetailScreen() {
             </View>
           )}
 
-          {/* Primary Action */}
+          {/* Add to Favorites Button */}
           <TouchableOpacity
             activeOpacity={0.85}
-            className="bg-gray-900 py-4 rounded-2xl items-center mb-6"
+            onPress={handleToggleFavorite}
+            disabled={savingFavorite}
+            className={`py-4 rounded-2xl items-center mb-6 ${
+              isFav ? 'bg-red-500' : 'bg-gray-900'
+            }`}
           >
             <View className="flex-row items-center">
-              <Ionicons name="heart-outline" size={22} color="white" />
-              <Text className="text-white font-semibold text-base ml-2">
-                Add to Favorites
-              </Text>
+              {savingFavorite ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <>
+                  <Ionicons
+                    name={isFav ? 'heart' : 'heart-outline'}
+                    size={22}
+                    color="white"
+                  />
+                  <Text className="text-white font-semibold text-base ml-2">
+                    {isFav ? 'Remove from Favorites' : 'Add to Favorites'}
+                  </Text>
+                </>
+              )}
             </View>
           </TouchableOpacity>
 
           {/* Overview */}
           <View className="mb-8">
-            <Text className="text-xl font-bold text-gray-900 mb-2">
-              Overview
-            </Text>
+            <Text className="text-xl font-bold text-gray-900 mb-2">Overview</Text>
             <Text className="text-gray-700 text-base leading-6">
               {movie.overview || 'No overview available.'}
             </Text>
@@ -183,21 +216,11 @@ export default function MovieDetailScreen() {
           {/* Cast */}
           {cast.length > 0 && (
             <View className="mb-8">
-              <Text className="text-xl font-bold text-gray-900 mb-4">
-                Cast
-              </Text>
-
+              <Text className="text-xl font-bold text-gray-900 mb-4">Cast</Text>
               {cast.map((actor) => (
                 <View
                   key={actor.id}
-                  className="
-                    flex-row items-center
-                    bg-white
-                    border border-gray-100
-                    rounded-2xl
-                    px-4 py-3
-                    mb-3
-                  "
+                  className="flex-row items-center bg-white border border-gray-100 rounded-2xl px-4 py-3 mb-3"
                 >
                   {actor.profile_path ? (
                     <Image
@@ -211,14 +234,11 @@ export default function MovieDetailScreen() {
                       <Ionicons name="person" size={22} color="#9CA3AF" />
                     </View>
                   )}
-
                   <View className="flex-1 ml-3">
                     <Text className="text-gray-900 font-semibold text-base">
                       {actor.name}
                     </Text>
-                    <Text className="text-gray-500 text-sm">
-                      {actor.character}
-                    </Text>
+                    <Text className="text-gray-500 text-sm">{actor.character}</Text>
                   </View>
                 </View>
               ))}
@@ -231,7 +251,6 @@ export default function MovieDetailScreen() {
               <Text className="text-xl font-bold text-gray-900 mb-3">
                 Box Office
               </Text>
-
               {movie.budget > 0 && (
                 <View className="flex-row justify-between py-3 border-b border-gray-200">
                   <Text className="text-gray-500">Budget</Text>
@@ -240,7 +259,6 @@ export default function MovieDetailScreen() {
                   </Text>
                 </View>
               )}
-
               {movie.revenue > 0 && (
                 <View className="flex-row justify-between py-3">
                   <Text className="text-gray-500">Revenue</Text>
