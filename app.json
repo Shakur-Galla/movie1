@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "movie1",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
@@ -43,6 +42,9 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "tmdbApiKey": "PUT_YOUR_TMDB_API_KEY_HERE"
     }
   }
 }
